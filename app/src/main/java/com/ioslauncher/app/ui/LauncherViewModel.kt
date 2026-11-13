@@ -22,6 +22,13 @@ sealed interface HomeItem {
     data class Builtin(val id: String) : HomeItem
 }
 
+/**
+ * Launcher state.
+ *
+ * The mutators are named `applyXxx` on purpose: a `var darkWallpaper` already
+ * generates a `setDarkWallpaper(Boolean)` on the JVM, so a hand-written
+ * `setDarkWallpaper` would clash with it and fail the build.
+ */
 class LauncherViewModel(app: Application) : AndroidViewModel(app) {
 
     private val prefs = LauncherPrefs(app)
@@ -163,24 +170,24 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         prefs.folders = folders
     }
 
-    fun setWallpaper(style: Int) {
+    fun applyWallpaper(style: Int) {
         wallpaperStyle = style
         customWallpaper = null
         prefs.wallpaperStyle = style
         prefs.customWallpaper = null
     }
 
-    fun setCustomWallpaper(uri: String?) {
+    fun applyCustomWallpaper(uri: String?) {
         customWallpaper = uri
         prefs.customWallpaper = uri
     }
 
-    fun setDarkWallpaper(dark: Boolean) {
+    fun applyDarkWallpaper(dark: Boolean) {
         darkWallpaper = dark
         prefs.darkWallpaper = dark
     }
 
-    fun setIconPack(packageName: String?) {
+    fun applyIconPack(packageName: String?) {
         iconPack = packageName
         prefs.iconPack = packageName
         viewModelScope.launch(Dispatchers.IO) {
@@ -188,27 +195,27 @@ class LauncherViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun setFakeBlur(on: Boolean) {
+    fun applyFakeBlur(on: Boolean) {
         fakeBlur = on
         prefs.fakeBlur = on
     }
 
-    fun setLockScreen(on: Boolean) {
+    fun applyLockScreen(on: Boolean) {
         lockScreenEnabled = on
         prefs.lockScreenEnabled = on
     }
 
-    fun setBlockSystemControlCenter(on: Boolean) {
+    fun applyBlockSystemControlCenter(on: Boolean) {
         blockSystemControlCenter = on
         prefs.blockSystemControlCenter = on
     }
 
-    fun setNavStyle(style: Int) {
+    fun applyNavStyle(style: Int) {
         navStyle = style
         prefs.navStyle = style
     }
 
-    fun setCustomNavBar(on: Boolean) {
+    fun applyCustomNavBar(on: Boolean) {
         customNavBar = on
         prefs.customNavBar = on
     }

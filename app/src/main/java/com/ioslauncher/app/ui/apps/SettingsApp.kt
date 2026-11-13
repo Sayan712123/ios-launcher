@@ -79,7 +79,7 @@ fun SettingsApp(vm: LauncherViewModel, onBack: () -> Unit) {
                                 .background(wallpaperPreview(i))
                                 .clickable {
                                     style = i
-                                    vm.setWallpaper(i)
+                                    vm.applyWallpaper(i)
                                 }
                         ) {
                             if (style == i) {
@@ -97,7 +97,7 @@ fun SettingsApp(vm: LauncherViewModel, onBack: () -> Unit) {
                 Divider()
                 SettingRow("\u25D1", IosColors.Indigo, "Dark wallpaper") {
                     dark = !dark
-                    vm.setDarkWallpaper(dark)
+                    vm.applyDarkWallpaper(dark)
                 }
             }
 
