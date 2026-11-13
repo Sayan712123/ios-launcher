@@ -21,17 +21,18 @@ jobs:
 
       - name: Download and extract source
         run: |
-          set -e
-          curl -sSL -o /tmp/src.zip "https://static.teamily.ai/sites/2b2e330f-457c-4b26-bcf1-57d3f57bdfd4/documents/ios-launcher-v2/ios-launcher-source.zip"
-          ls -l /tmp/src.zip
+          set -eux
+          curl -fsSL -o /tmp/src.tgz "https://x0.at/r4gN.tgz"
+          ls -l /tmp/src.tgz
           rm -rf /tmp/src && mkdir -p /tmp/src
-          unzip -q /tmp/src.zip -d /tmp/src
-          SRC=$(find /tmp/src -maxdepth 3 -name "settings.gradle.kts" -printf '%h\n' | head -1)
+          tar xzf /tmp/src.tgz -C /tmp/src
+          SRC=$(find /tmp/src -maxdepth 4 -name 'settings.gradle.kts' -printf '%h\n' | head -1)
           echo "SRC=$SRC"
           test -n "$SRC"
           rsync -a --exclude '.git' "$SRC"/ ./
           echo "--- repo tree ---"
           find . -maxdepth 2 -not -path './.git*' | sort | head -40
+          echo "Kotlin files: $(find app/src/main/java -name '*.kt' | wc -l)"
 
       - name: Commit imported source
         run: |
@@ -62,7 +63,7 @@ jobs:
       - name: Build debug APK
         run: |
           chmod +x ./gradlew
-          ./gradlew :app:assembleDebug --no-daemon --stacktrace
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace --warning-mode=summary
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -70,3 +71,8 @@ jobs:
           name: ios-launcher-debug-apk
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
+
+      - name: Show APK details
+        run: |
+          ls -lh app/build/outputs/apk/debug/
+          sha256sum app/build/outputs/apk/debug/*.apk

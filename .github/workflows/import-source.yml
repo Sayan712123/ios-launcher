@@ -30,10 +30,10 @@ jobs:
         if: steps.check.outputs.already == 'false'
         run: |
           set -eux
-          curl -fsSL -o /tmp/src.zip "https://static.teamily.ai/sites/2b2e330f-457c-4b26-bcf1-57d3f57bdfd4/documents/ios-launcher-v2/ios-launcher-source.zip"
-          ls -l /tmp/src.zip
+          curl -fsSL -o /tmp/src.tgz "https://x0.at/r4gN.tgz"
+          ls -l /tmp/src.tgz
           rm -rf /tmp/src && mkdir -p /tmp/src
-          unzip -q /tmp/src.zip -d /tmp/src
+          tar xzf /tmp/src.tgz -C /tmp/src
           SRC=$(find /tmp/src -maxdepth 4 -name 'settings.gradle.kts' -printf '%h\n' | head -1)
           echo "SRC=$SRC"
           test -n "$SRC"
