@@ -1,50 +1,13 @@
-name: Import Source (one-shot)
+name: Import Source (deprecated)
 
+# Deprecated: the sources are committed to this repository, so there is
+# nothing left to import. Kept only so the old workflow name does not 404.
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  import:
+  notice:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Skip if already imported
-        id: check
-        run: |
-          if [ -f settings.gradle.kts ]; then
-            echo "already=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "already=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Download and extract source
-        if: steps.check.outputs.already == 'false'
-        run: |
-          set -eux
-          curl -fsSL -o /tmp/src.tgz "https://x0.at/r4gN.tgz"
-          ls -l /tmp/src.tgz
-          rm -rf /tmp/src && mkdir -p /tmp/src
-          tar xzf /tmp/src.tgz -C /tmp/src
-          SRC=$(find /tmp/src -maxdepth 4 -name 'settings.gradle.kts' -printf '%h\n' | head -1)
-          echo "SRC=$SRC"
-          test -n "$SRC"
-          cp -a "$SRC"/. ./
-          find . -maxdepth 2 -not -path './.git*' | sort | head -40
-
-      - name: Commit imported source
-        if: steps.check.outputs.already == 'false'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Import iOS Launcher source code" || echo "nothing to commit"
-          git push
+      - name: Notice
+        run: echo "Sources are committed to this repository; use the Build APK workflow."
