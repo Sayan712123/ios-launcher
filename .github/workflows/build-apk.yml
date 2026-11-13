@@ -1,17 +1,14 @@
 name: Build APK
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main ]
-
-permissions:
-  contents: read
+    branches: [ main, master ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
 
     steps:
       - name: Checkout
@@ -26,13 +23,19 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      # The Gradle wrapper jar is binary and is not committed, so the build
+      # uses the Gradle distribution this action installs instead of ./gradlew.
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: '8.7'
 
       - name: Build debug APK
         run: gradle :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Build release APK (unsigned)
+        run: gradle :app:assembleRelease --no-daemon --stacktrace
+        continue-on-error: true
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -41,7 +44,9 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
 
-      - name: Show APK details
-        run: |
-          ls -lh app/build/outputs/apk/debug/
-          sha256sum app/build/outputs/apk/debug/*.apk
+      - name: Upload release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-launcher-release-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: warn
